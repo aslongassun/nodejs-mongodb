@@ -21,6 +21,7 @@ npm init
 npm install express
 npm install body-parser
 npm install mongoose
+npm install socket.io
 ```
 3) Run the server<br/>
 At the project folder run this commandline<br/>
