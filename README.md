@@ -47,3 +47,5 @@ private static string _Port = ":" + "3000";
 ```
 7) Build and Run the application<br/>
 For more information about set up User role and Admin role to test, please read README.md file of Client Unity application project
+
+## Reference: [NodeJS connect to Redis ](https://github.com/aslongassun/nodejs-redis)<br />
