@@ -2,11 +2,10 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var socketIO = require('socket.io');
+var User = require('./User');
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-var User = require('./User');
 
 // create user
 router.post('/', function (req, res) {
@@ -50,54 +49,6 @@ router.post('/login', function (req, res) {
         if (users.length == 0) return res.status(404).send("Not found any user.");
         res.status(200).send(users);
         console.log("Login Called");
-    });
-});
-
-
-// Socket io opening
-var PORTSOCKET = process.env.PORT || 4567;
-var server = express()
-  .use((req, res) => res.sendFile(INDEX) )
-  .listen(PORTSOCKET, () => console.log('Socket listening on port ' + PORTSOCKET));
-
-var io = socketIO(server);
-io.on('connection', (socket) => {
-
-    // Listen emit get users event
-    socket.on('getusers', function() {
-        User.find({role:"user"}, function (err, users) {
-            var myObject = {
-                items: JSON.stringify(users)
-            }
-            socket.emit('receiveusers', myObject);
-        }).sort({score: 'desc'});
-    });
-
-    // Listen emit get users event from admin
-    socket.on('getusers-from-admin', function(data) {
-
-        var date = new Date();
-        var minutes = parseInt(data);
-
-        if (minutes > 0){
-
-            date.setMinutes(date.getMinutes() - minutes);
-            User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
-                var myObject = {
-                    items: JSON.stringify(users)
-                }
-                socket.emit('receiveusers', myObject);
-            }).sort({updatedAt: 'desc'});
-
-        } else {
-            User.find({role:"user"}, function (err, users) {
-                var myObject = {
-                    items: JSON.stringify(users)
-                }
-                socket.emit('receiveusers', myObject);
-            }).sort({updatedAt: 'desc'});
-        }
-
     });
 });
 
