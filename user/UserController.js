@@ -8,57 +8,6 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 
-
-// var _PortSocketIO = 4567;
-// var io = require('socket.io')({
-//     transports: ['websocket'],
-// });
-// io.attach(_PortSocketIO);
-
-//setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
-
-// io.on('connection', function(socket){
-
-//     // Listen emit get users event
-//     socket.on('getusers', function() {
-//         User.find({role:"user"}, function (err, users) {
-//         	var myObject = {
-//                 items: JSON.stringify(users)
-//             }
-//             socket.emit('receiveusers', myObject);
-//     	}).sort({score: 'desc'});
-//     });
-
-//     // Listen emit get users event from admin
-//     socket.on('getusers-from-admin', function(data) {
-
-//         var date = new Date();
-// 		var minutes = parseInt(data);
-
-//         if (minutes > 0){
-
-//             date.setMinutes(date.getMinutes() - minutes);
-// 		    User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
-// 		        var myObject = {
-//                 	items: JSON.stringify(users)
-// 	            }
-// 	            socket.emit('receiveusers', myObject);
-// 		    }).sort({updatedAt: 'desc'});
-
-//         } else {
-// 		    User.find({role:"user"}, function (err, users) {
-// 		        var myObject = {
-//                 	items: JSON.stringify(users)
-//             	}
-//             	socket.emit('receiveusers', myObject);
-// 		    }).sort({updatedAt: 'desc'});
-//         }
-
-//     });
-
-// })
-
-
 // create user
 router.post('/', function (req, res) {
     User.create({
@@ -75,48 +24,6 @@ router.post('/', function (req, res) {
             console.log("Create Called");
         });
 });
-
-//return all the user in database
-// router.get('/', function (req, res) {
-//     User.find({role:"user"}, function (err, users) {
-//         if (err) return res.status(500).send("Problem when get all users.");
-//         res.status(200).send(users);
-//         console.log("Gets Called");
-//     }).sort({score: 'desc'});
-// });
-
-//return all the user in database
-// router.get('/admin', function (req, res) {
-//     User.find({role:"user"}, function (err, users) {
-//         if (err) return res.status(500).send("Problem when get all users.");
-//         res.status(200).send(users);
-//         console.log("Gets Called");
-//     }).sort({updatedAt: 'desc'});
-// });
-
-// router.get('/admin/:time', function (req, res) {
-	
-// 	var date = new Date();
-// 	var minutes = parseInt(req.params.time);
-
-// 	date.setMinutes(date.getMinutes() - minutes);
-
-//     User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
-//         if (err) return res.status(500).send("Problem when get all users.");
-//         res.status(200).send(users);
-//         console.log("Gets Called");
-//     }).sort({updatedAt: 'desc'});
-    
-// });
-
-// get user from id
-// router.get('/:id', function (req, res) {
-//     User.findById(req.params.id, function (err, user) {
-//         if (err) return res.status(500).send("Problem when finding user by id.");
-//         if (!user) return res.status(404).send("No user found.");
-//         res.status(200).send(user);
-//     });
-// });
 
 // delete user
 router.delete('/:id', function (req, res) {
@@ -190,8 +97,51 @@ io.on('connection', (socket) => {
                 socket.emit('receiveusers', myObject);
             }).sort({updatedAt: 'desc'});
         }
-        
+
     });
 });
 
 module.exports = router;
+
+
+//return all the user in database
+// router.get('/', function (req, res) {
+//     User.find({role:"user"}, function (err, users) {
+//         if (err) return res.status(500).send("Problem when get all users.");
+//         res.status(200).send(users);
+//         console.log("Gets Called");
+//     }).sort({score: 'desc'});
+// });
+
+//return all the user in database
+// router.get('/admin', function (req, res) {
+//     User.find({role:"user"}, function (err, users) {
+//         if (err) return res.status(500).send("Problem when get all users.");
+//         res.status(200).send(users);
+//         console.log("Gets Called");
+//     }).sort({updatedAt: 'desc'});
+// });
+
+// router.get('/admin/:time', function (req, res) {
+    
+//  var date = new Date();
+//  var minutes = parseInt(req.params.time);
+
+//  date.setMinutes(date.getMinutes() - minutes);
+
+//     User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
+//         if (err) return res.status(500).send("Problem when get all users.");
+//         res.status(200).send(users);
+//         console.log("Gets Called");
+//     }).sort({updatedAt: 'desc'});
+    
+// });
+
+// get user from id
+// router.get('/:id', function (req, res) {
+//     User.findById(req.params.id, function (err, user) {
+//         if (err) return res.status(500).send("Problem when finding user by id.");
+//         if (!user) return res.status(404).send("No user found.");
+//         res.status(200).send(user);
+//     });
+// });
