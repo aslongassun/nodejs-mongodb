@@ -12,6 +12,9 @@ var io = require('socket.io')({
     transports: ['websocket'],
 });
 io.attach(_PortSocketIO);
+
+//setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+
 io.on('connection', function(socket){
 
     // Listen emit get users event
