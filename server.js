@@ -11,40 +11,51 @@ var server = app.listen(port, function() {
 var io = socketIO(server);
 io.on('connection', (socket) => {
 
-    // Listen emit get users event
-    socket.on('getusers', function() {
+    // update list user realtime
+    function intervalFunc() {
         User.find({role:"user"}, function (err, users) {
             var myObject = {
                 items: JSON.stringify(users)
             }
             socket.emit('receiveusers', myObject);
         }).sort({score: 'desc'});
-    });
+    }
 
-    // Listen emit get users event from admin
-    socket.on('getusers-from-admin', function(data) {
+    setInterval(intervalFunc, 1000);
 
-        var date = new Date();
-        var minutes = parseInt(data);
+    // Listen emit get users event
+    // socket.on('getusers', function() {
+    //     User.find({role:"user"}, function (err, users) {
+    //         var myObject = {
+    //             items: JSON.stringify(users)
+    //         }
+    //         socket.emit('receiveusers', myObject);
+    //     }).sort({score: 'desc'});
+    // });
 
-        if (minutes > 0){
+    // // Listen emit get users event from admin
+    // socket.on('getusers-from-admin', function(data) {
 
-            date.setMinutes(date.getMinutes() - minutes);
-            User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
-                var myObject = {
-                    items: JSON.stringify(users)
-                }
-                socket.emit('receiveusers', myObject);
-            }).sort({updatedAt: 'desc'});
+    //     var date = new Date();
+    //     var minutes = parseInt(data);
 
-        } else {
-            User.find({role:"user"}, function (err, users) {
-                var myObject = {
-                    items: JSON.stringify(users)
-                }
-                socket.emit('receiveusers', myObject);
-            }).sort({updatedAt: 'desc'});
-        }
+    //     if (minutes > 0){
 
-    });
+    //         date.setMinutes(date.getMinutes() - minutes);
+    //         User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
+    //             var myObject = {
+    //                 items: JSON.stringify(users)
+    //             }
+    //             socket.emit('receiveusers', myObject);
+    //         }).sort({updatedAt: 'desc'});
+
+    //     } else {
+    //         User.find({role:"user"}, function (err, users) {
+    //             var myObject = {
+    //                 items: JSON.stringify(users)
+    //             }
+    //             socket.emit('receiveusers', myObject);
+    //         }).sort({updatedAt: 'desc'});
+    //     }
+    // });
 });

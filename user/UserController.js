@@ -52,6 +52,28 @@ router.post('/login', function (req, res) {
     });
 });
 
+// get user info for admin
+router.get('/admin/:time', function (req, res) {
+    
+    var date = new Date();
+    var minutes = parseInt(req.params.time);
+
+    date.setMinutes(date.getMinutes() - minutes);
+
+    if (minutes > 0){
+        User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
+            if (err) return res.status(500).send("Problem when get all users.");
+            res.status(200).send(users);
+        }).sort({updatedAt: 'desc'});
+    } else {
+        User.find({role:"user"}, function (err, users) {
+            if (err) return res.status(500).send("Problem when get all users.");
+            res.status(200).send(users);
+        }).sort({updatedAt: 'desc'});
+    }
+    
+});
+
 module.exports = router;
 
 
