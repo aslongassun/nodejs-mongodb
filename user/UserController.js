@@ -2,59 +2,61 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var socketIO = require('socket.io');
+
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 
 
-var _PortSocketIO = 4567;
-var io = require('socket.io')({
-    transports: ['websocket'],
-});
-io.attach(_PortSocketIO);
+// var _PortSocketIO = 4567;
+// var io = require('socket.io')({
+//     transports: ['websocket'],
+// });
+// io.attach(_PortSocketIO);
 
 //setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
 
-io.on('connection', function(socket){
+// io.on('connection', function(socket){
 
-    // Listen emit get users event
-    socket.on('getusers', function() {
-        User.find({role:"user"}, function (err, users) {
-        	var myObject = {
-                items: JSON.stringify(users)
-            }
-            socket.emit('receiveusers', myObject);
-    	}).sort({score: 'desc'});
-    });
+//     // Listen emit get users event
+//     socket.on('getusers', function() {
+//         User.find({role:"user"}, function (err, users) {
+//         	var myObject = {
+//                 items: JSON.stringify(users)
+//             }
+//             socket.emit('receiveusers', myObject);
+//     	}).sort({score: 'desc'});
+//     });
 
-    // Listen emit get users event from admin
-    socket.on('getusers-from-admin', function(data) {
+//     // Listen emit get users event from admin
+//     socket.on('getusers-from-admin', function(data) {
 
-        var date = new Date();
-		var minutes = parseInt(data);
+//         var date = new Date();
+// 		var minutes = parseInt(data);
 
-        if (minutes > 0){
+//         if (minutes > 0){
 
-            date.setMinutes(date.getMinutes() - minutes);
-		    User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
-		        var myObject = {
-                	items: JSON.stringify(users)
-	            }
-	            socket.emit('receiveusers', myObject);
-		    }).sort({updatedAt: 'desc'});
+//             date.setMinutes(date.getMinutes() - minutes);
+// 		    User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
+// 		        var myObject = {
+//                 	items: JSON.stringify(users)
+// 	            }
+// 	            socket.emit('receiveusers', myObject);
+// 		    }).sort({updatedAt: 'desc'});
 
-        } else {
-		    User.find({role:"user"}, function (err, users) {
-		        var myObject = {
-                	items: JSON.stringify(users)
-            	}
-            	socket.emit('receiveusers', myObject);
-		    }).sort({updatedAt: 'desc'});
-        }
+//         } else {
+// 		    User.find({role:"user"}, function (err, users) {
+// 		        var myObject = {
+//                 	items: JSON.stringify(users)
+//             	}
+//             	socket.emit('receiveusers', myObject);
+// 		    }).sort({updatedAt: 'desc'});
+//         }
 
-    });
+//     });
 
-})
+// })
 
 
 // create user
@@ -145,6 +147,51 @@ router.post('/login', function (req, res) {
 });
 
 
+// Socket io opening
+var PORTSOCKET = process.env.PORT || 4567;
+var server = express()
+  .use((req, res) => res.sendFile(INDEX) )
+  .listen(PORTSOCKET, () => console.log('Socket listening on port ' + PORTSOCKET));
 
+var io = socketIO(server);
+io.on('connection', (socket) => {
+
+    // Listen emit get users event
+    socket.on('getusers', function() {
+        User.find({role:"user"}, function (err, users) {
+            var myObject = {
+                items: JSON.stringify(users)
+            }
+            socket.emit('receiveusers', myObject);
+        }).sort({score: 'desc'});
+    });
+
+    // Listen emit get users event from admin
+    socket.on('getusers-from-admin', function(data) {
+
+        var date = new Date();
+        var minutes = parseInt(data);
+
+        if (minutes > 0){
+
+            date.setMinutes(date.getMinutes() - minutes);
+            User.find({role:"user",updatedAt: {$gte: date}}, function (err, users) {
+                var myObject = {
+                    items: JSON.stringify(users)
+                }
+                socket.emit('receiveusers', myObject);
+            }).sort({updatedAt: 'desc'});
+
+        } else {
+            User.find({role:"user"}, function (err, users) {
+                var myObject = {
+                    items: JSON.stringify(users)
+                }
+                socket.emit('receiveusers', myObject);
+            }).sort({updatedAt: 'desc'});
+        }
+        
+    });
+});
 
 module.exports = router;
